@@ -1,0 +1,104 @@
+## PROCESS DOCUMENTATION (VERN-API: BACKEND FOR VERNACULAR PROJECT) ##
+
+# GENERAL SETUP #
+[ ] set up: core packages with NPM
+    [ ] npm install --save <dependency>
+    [ ] npm install --save-dev <dependency>
+
+[ ] set up: lintern and code formatter
+    [ ] ESLINT installation and config (.eslintrc)
+    [ ] PRETTIER installation and config (.prettierrc)
+
+[ ] MONGODB installation using BREW
+    -> start mongodb: brew services start mongodb-community
+    -> stop mongodb: brew services stop mongodb-community
+
+[ ] set up: GIT 
+    [ ] git init (local repo)
+    [ ] .gitignore (uses template from gitignore.io)
+    [ ] set up: GITHUB
+        [ ] SSH creation (following Git Help instructions)
+            -> uses: ssh-keygen
+            -> checking ssh keys: ~% ls ./.ssh 
+    [ ] create new repo
+    [ ] add remote repo to the local project
+        -> git remote add origin git@github.com:<user-name>/<repo-name>
+
+# NODE APP SETUP #
+[ ] set up: project base scaffolding
+    [ ] environment mode configuration
+        [ ] .ENV file for environment variables
+             -> uses DOTENV depencency to load custom environment variables (relevant on production mode)
+    [ ] SRC folder      containing all code (not meta config)
+    [ ] CONFIG folder:
+        [ ] index.js    containing the logic (uses switch statemente) depending on the MODE_ENV variable at initialization 
+        [ ] dev.js      with mocked config params and secret keys  
+        [ ] prod.js     constains the logic to read real config params and secret keys from loaded environment variables at initialization
+
+    [ ] server initialization and db connection
+        [ ] index.js    only purpose: to serve as entry point (for total abstraction) by calling start func defined at server.js
+        [ ] server.js   db connection and server initialization exported as a function module to be called at index.js
+                        [ ] 1. app creation: CONST APP = EXPRESS()
+                        [ ] 1. db connection
+                            -> connect function call (for total abstraction of db related stuff in module exported in db.js)
+                             -> TRY/CATCH & ASYNC/AWAIT pattern for ALL operations on db
+                        [ ] 2. APP.LISTEN function call
+            [ ] db.js   only purpose: hold db connection 
+                        -> MONGOOSE.CONNECT function call
+                        -> connection exported as a function module to be called at index.js
+    [ ] initializations SCRIPTS
+        [ ] 'dev'       for development
+                        -> uses NODEMON dependency for automatic restart whenever there's changes in project
+                        -> "dev": "nodemon src/index.js"
+                        -> command: ~% npm run dev
+        [ ] 'start'     exclusively to run app in production mode
+                        -> passes ENV_MODE=production that triggers the loading of environment vars and secret keys, etc.
+                        -> "NODE_ENV=production node src/index.js"
+                        -> command to run: ~% npm run start
+    [ ] RESOURCES folder
+        [ ] SCRIPT      contains the following (related to scripts *in the context of the vernacular app*)
+            [ ] script.controller.js
+            [ ] script.model.js
+            [ ] script.router.js  
+        [ ] USER      contains the following (related to users)
+            [ ] user.controller.js
+            [ ] user.model.js
+            [ ] user.router.js     
+
+# MIDDLEWARE #
+[ ] express CORS middleware                           
+    -> binding to app instance: APP.USES(CORS())
+[ ] express JSON middleware
+    -> binding to app instance: APP.USES(EXPRESS.JSON())
+
+#  ROUTING #
+[ ] user.router.js -- router for users
+    [ ] 1. router creation: CONST ROUTER = ROUTER()
+    [ ] 2. add routes: ROUTER.ROUTE('/') and ROUTER.ROUTE('/:id')
+    [ ] 3. add proper HTTP verbs ('GET', 'POST', 'PUT', 'DELETE') for each route
+           to support proper CRUD operations ('CREATE', 'READ', 'UPDATE', 'DELETE')
+           with dummy callback function for now
+[ ] script.router.js -- router for scripts
+[ ] mount router on the app
+    [ ] APP.USE('/api/user', userRouter)
+    [ ] APP.USE('/api/script', scriptRouter)
+        -> '/api/user' is base url for users
+        -> '/api/script' is base url for scripts
+[ ] test routes with INSOMIA
+
+# TODO NEXT #
+[ ] models
+    [ ] mongoose schema definition
+    [ ] model instantiation
+[ ] controllers
+    [ ] mongoose query definition to support CRUD
+    [ ] pass the controllers to the routes defined in the routers 
+ 
+    
+
+
+!! NOTES TO MYSELF !!
+[ ] different commits for different changes
+    -> git add <files related> <to some change>
+    -> then: git commit with a relevant message for those changes
+    * avoid: git add . (at the end of the day with a very general message)
