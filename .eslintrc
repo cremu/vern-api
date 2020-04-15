@@ -8,5 +8,7 @@
     "node": true,
     "jest": true
   },
-  "rules": {}
+  "rules": {
+    "no-unexpected-multiline": 1
+  }
 }
